@@ -141,14 +141,14 @@ def power_monitor(work_space: Path):
     ret: List[Dict[str, Union[str, int, Dict[str, int]]]] = list()
 
     for socket_path, (prev_socket_power, socket) in monitors.items():
-        with open(socket_path / 'name') as name_fp, open(socket_path / _ENERGY_FILE_NAME) as power_fp:
+        with (socket_path / 'name').open() as name_fp, (socket_path / _ENERGY_FILE_NAME).open() as power_fp:
             sub_name = name_fp.readline().strip()
             after = int(power_fp.readline())
 
         if after > prev_socket_power:
             diff = after - prev_socket_power
         else:
-            with open(socket_path / _MAX_ENERGY_VALUE_FILE_NAME) as fp:
+            with (socket_path / _MAX_ENERGY_VALUE_FILE_NAME).open() as fp:
                 max_value = int(fp.readline())
                 diff = max_value - prev_socket_power + after
 
@@ -159,14 +159,14 @@ def power_monitor(work_space: Path):
         }
 
         for path, before in socket.items():
-            with open(path / _ENERGY_FILE_NAME) as energy_fp, open(path / 'name') as name_fp:
+            with (path / _ENERGY_FILE_NAME).open() as energy_fp, (path / 'name').open() as name_fp:
                 after = int(energy_fp.readline())
                 name = name_fp.readline().strip()
 
                 if after > prev_socket_power:
                     diff = after - before
                 else:
-                    with open(path / _MAX_ENERGY_VALUE_FILE_NAME) as fp:
+                    with (path / _MAX_ENERGY_VALUE_FILE_NAME).open() as fp:
                         max_value = int(fp.readline())
                         diff = max_value - before + after
 
@@ -176,7 +176,7 @@ def power_monitor(work_space: Path):
 
     result_file = work_space / 'result.json'
     if result_file.exists():
-        with open(result_file, mode='r+') as fp:
+        with result_file.open('r+') as fp:
             try:
                 original = json.load(fp)
                 original['power'] = ret
@@ -189,7 +189,7 @@ def power_monitor(work_space: Path):
                 fp.truncate()
                 json.dump({'power': ret}, fp, indent=4)
     else:
-        with open(result_file, mode='w') as fp:
+        with result_file.open('w') as fp:
             json.dump({'power': ret}, fp, indent=4)
 
 
@@ -197,24 +197,24 @@ def power_monitor(work_space: Path):
 def hyper_threading_guard(loop: asyncio.AbstractEventLoop, ht_flag):
     async def _gather_online_core(online_file: Path, core_id: int):
         if online_file.is_file():
-            async with aiofiles.open(online_file) as fp:
-                line = await fp.readline()
+            async with aiofiles.open(online_file) as afp:
+                line = await afp.readline()
                 if line.strip() == '1':
                     return core_id
 
     jobs: List[Coroutine] = []
 
-    core_id = 1
+    cur_core_id = 1
     while True:
-        path = Path(f'/sys/devices/system/cpu/cpu{core_id}')
+        path = Path(f'/sys/devices/system/cpu/cpu{cur_core_id}')
 
         if not path.is_dir():
             break
 
         else:
-            jobs.append(_gather_online_core(path / 'online', core_id))
+            jobs.append(_gather_online_core(path / 'online', cur_core_id))
 
-        core_id += 1
+        cur_core_id += 1
 
     online_core: Set[int] = set(filter(None.__ne__, loop.run_until_complete(asyncio.gather(*jobs))))
 
@@ -223,8 +223,8 @@ def hyper_threading_guard(loop: asyncio.AbstractEventLoop, ht_flag):
 
         logical_cores: Set[int] = set()
 
-        for core_id in online_core | {0}:
-            with open(f'/sys/devices/system/cpu/cpu{core_id}/topology/thread_siblings_list') as fp:
+        for cur_core_id in online_core | {0}:
+            with open(f'/sys/devices/system/cpu/cpu{cur_core_id}/topology/thread_siblings_list') as fp:
                 for core in fp.readline().strip().split(',')[1:]:
                     logical_cores.add(int(core))
 
@@ -240,7 +240,7 @@ def hyper_threading_guard(loop: asyncio.AbstractEventLoop, ht_flag):
     subprocess.run(('sudo', 'tee', *files_to_write), input="1", encoding='UTF-8', stdout=subprocess.DEVNULL)
 
 
-GLOBAL_CFG_PATH = Path(__file__).resolve().parent / 'config.json'
+GLOBAL_CFG_PATH: Path = Path(__file__).resolve().parent / 'config.json'
 
 
 def launch(loop: asyncio.AbstractEventLoop, workspace: Path, print_log: bool, print_metric_log: bool, verbose: bool):
@@ -253,8 +253,8 @@ def launch(loop: asyncio.AbstractEventLoop, workspace: Path, print_log: bool, pr
         print(f'{config_file.resolve()} is not exist.', file=sys.stderr)
         return False
 
-    with open(config_file) as local_config_fp, \
-            open(GLOBAL_CFG_PATH) as global_config_fp:
+    with config_file.open() as local_config_fp, \
+            GLOBAL_CFG_PATH.open() as global_config_fp:
         local_cfg_source: Dict[str, Any] = json.load(local_config_fp)
         global_cfg_source: Dict[str, Any] = json.load(global_config_fp)
 
@@ -285,7 +285,7 @@ def launch(loop: asyncio.AbstractEventLoop, workspace: Path, print_log: bool, pr
         a_bench = task_map[a_task]
 
         if result_file.exists():
-            with open(result_file, mode='r+') as fp:
+            with result_file.open('r+') as fp:
                 try:
                     original: Dict[str, Any] = json.load(fp)
 
@@ -302,7 +302,7 @@ def launch(loop: asyncio.AbstractEventLoop, workspace: Path, print_log: bool, pr
                     fp.truncate()
                     json.dump({'runtime': {a_bench.identifier: a_bench.runtime}}, fp, indent=4)
         else:
-            with open(result_file, mode='w') as fp:
+            with result_file.open('w') as fp:
                 json.dump({'runtime': {a_bench.identifier: a_bench.runtime}}, fp, indent=4)
 
         a_task.remove_done_callback(store_runtime)

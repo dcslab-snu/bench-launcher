@@ -21,5 +21,5 @@ def run(workspace: Path, global_cfg_path: Path):
     if not output_path.exists():
         output_path.mkdir(parents=True)
 
-    with open(output_path / 'avg.csv', mode='w') as fp:
+    with (output_path / 'avg.csv').open('w') as fp:
         fp.flush()

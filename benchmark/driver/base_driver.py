@@ -74,7 +74,7 @@ class BenchDriver(metaclass=ABCMeta):
     @staticmethod
     def get_bench_home(bench_name: str) -> str:
         from benchmark_launcher import GLOBAL_CFG_PATH
-        with open(GLOBAL_CFG_PATH) as fp:
+        with GLOBAL_CFG_PATH.open() as fp:
             return json.load(fp)['benchmark'][bench_name]
 
     @property
