@@ -62,7 +62,6 @@ class BenchDriver(metaclass=ABCMeta):
         self._name: str = name
         self._type: str = workload_type
         self._identifier: str = identifier
-        self._cpu_percent: float = cpu_percent
         self._binding_cores: str = binding_cores
         if num_threads is not None:
             self._num_threads: int = num_threads
@@ -70,6 +69,7 @@ class BenchDriver(metaclass=ABCMeta):
             self._num_threads: int = len(convert_to_set(binding_cores))
         self._numa_mem_nodes: Optional[str] = numa_mem_nodes
         self._cpu_freq: Optional[float] = cpu_freq
+        self._cpu_percent: Optional[float] = cpu_percent
         self._cbm_ranges: Optional[Union[str, List[str]]] = cbm_ranges
 
         self._bench_proc_info: Optional[psutil.Process] = None
@@ -77,7 +77,7 @@ class BenchDriver(metaclass=ABCMeta):
         self._async_proc_info: Optional[psutil.Process] = None
 
         self._group_name = identifier
-        self._cgroup: Cgroup = Cgroup(identifier)
+        self._cgroup: Cgroup = Cgroup(identifier, 'cpuset,cpu')
         self._resctrl_group: ResCtrl = ResCtrl()
 
     def __del__(self):

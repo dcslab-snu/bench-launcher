@@ -58,12 +58,12 @@ class Cgroup:
         await proc.communicate()
 
     async def _get_cpu_affinity_from_group(self) -> Set[int]:
-        async with aiofiles.open(f'{Cgroup.CPU_MOUNT_POINT}/cpuset.cpus/{self._group_name}') as afp:
+        async with aiofiles.open(f'{Cgroup.CPUSET_MOUNT_POINT}/{self._group_name}/cpuset.cpus') as afp:
             line: str = await afp.readline()
             core_set: Set[int] = convert_to_set(line)
         return core_set
 
-    async def limit_cpu_quota(self, limit_percentage: float, period: Optional[int]) -> None:
+    async def limit_cpu_quota(self, limit_percentage: float, period: Optional[int]=None) -> None:
         if period is None:
             async with aiofiles.open(f'{Cgroup.CPU_MOUNT_POINT}/cpu.cfs_period_us') as afp:
                 line: str = await afp.readline()
