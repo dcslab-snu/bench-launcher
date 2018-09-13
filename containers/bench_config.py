@@ -7,13 +7,15 @@ from benchmark.driver.base_driver import BenchDriver, bench_driver
 
 class BenchConfig:
     def __init__(self, workload_name: str, workload_type: str, binding_cores: str, num_of_threads: int = None,
-                 numa_mem_nodes: str = None, cpu_freq: float = None, cbm_ranges: Union[str, List[str]] = None):
+                 numa_mem_nodes: str = None, cpu_freq: float = None, cpu_percent: float = None,
+                 cbm_ranges: Union[str, List[str]] = None):
         self._workload_name: str = workload_name
         self._workload_type: str = workload_type
         self._binding_cores: str = binding_cores
         self._num_of_threads: Optional[int] = num_of_threads
         self._numa_mem_nodes: Optional[str] = numa_mem_nodes
         self._cpu_freq: Optional[float] = cpu_freq
+        self._cpu_percent: Optional[float] = cpu_percent
         self._cbm_ranges: Optional[Union[str, List[str]]] = cbm_ranges
 
     @property
@@ -41,12 +43,17 @@ class BenchConfig:
         return self._cpu_freq
 
     @property
+    def cpu_percent(self) -> Optional[float]:
+        return self._cpu_percent
+
+    @property
     def cbm_ranges(self) -> Optional[Union[str, List[str]]]:
         return self._cbm_ranges
 
     def generate_driver(self, identifier: str) -> BenchDriver:
         return bench_driver(self._workload_name, self._workload_type, identifier, self._binding_cores,
-                            self._num_of_threads, self._numa_mem_nodes, self._cpu_freq, self._cbm_ranges)
+                            self._num_of_threads, self._numa_mem_nodes, self._cpu_freq, self._cpu_percent,
+                            self._cbm_ranges)
 
     @staticmethod
     def gen_identifier(target: 'BenchConfig', configs: List['BenchConfig']) -> str:
@@ -55,6 +62,7 @@ class BenchConfig:
         cores_same = True
         numa_same = True
         freq_same = True
+        percent_same = True
         cbm_same = True
 
         index_in_same_cfg = None
@@ -73,6 +81,8 @@ class BenchConfig:
                 _all_same = numa_same = False
             if target._cpu_freq != config._cpu_freq:
                 _all_same = freq_same = False
+            if target._cpu_percent != config._cpu_percent:
+                _all_same = percent_same = False
             if target.cbm_ranges != config._cbm_ranges:
                 _all_same = cbm_same = False
 
@@ -94,6 +104,8 @@ class BenchConfig:
             names.append(f'socket({target.numa_nodes})')
         if not freq_same:
             names.append(f'{target.cpu_freq}GHz')
+        if not percent_same:
+                names.append(f'{target.cpu_percent}GHz')
         if not cbm_same:
             names.append(f'cbm{target.cbm_ranges}')
         if num_of_same_cfg is not 0:

@@ -10,7 +10,7 @@ from typing import Any, Callable, Coroutine, Iterable, List, Optional, Set, Tupl
 
 import psutil
 
-from ..utils.cgroup_cpuset import CgroupCpuset
+from ..utils.cgroup import Cgroup
 from ..utils.dvfs import DVFS
 from ..utils.hyphen import convert_to_hyphen, convert_to_set
 from ..utils.numa_topology import NumaTopology
@@ -57,10 +57,12 @@ class BenchDriver(metaclass=ABCMeta):
     bench_name: str = None
 
     def __init__(self, name: str, workload_type: str, identifier: str, binding_cores: str, num_threads: int = None,
-                 numa_mem_nodes: str = None, cpu_freq: float = None, cbm_ranges: Union[str, List[str]] = None):
+                 numa_mem_nodes: str = None, cpu_freq: float = None, cpu_percent: float = None,
+                 cbm_ranges: Union[str, List[str]] = None):
         self._name: str = name
         self._type: str = workload_type
         self._identifier: str = identifier
+        self._cpu_percent: float = cpu_percent
         self._binding_cores: str = binding_cores
         if num_threads is not None:
             self._num_threads: int = num_threads
@@ -75,7 +77,7 @@ class BenchDriver(metaclass=ABCMeta):
         self._async_proc_info: Optional[psutil.Process] = None
 
         self._group_name = identifier
-        self._cgroup: CgroupCpuset = CgroupCpuset(identifier)
+        self._cgroup: Cgroup = Cgroup(identifier)
         self._resctrl_group: ResCtrl = ResCtrl()
 
     def __del__(self):
@@ -157,6 +159,8 @@ class BenchDriver(metaclass=ABCMeta):
         await self._cgroup.assign_cpus(self._binding_cores)
         mem_sockets: str = await self.__get_effective_mem_nodes()
         await self._cgroup.assign_mems(mem_sockets)
+        if self._cpu_percent is not None:
+            await self._cgroup.limit_cpu_quota(self._cpu_percent)
 
         self._async_proc = await self._launch_bench()
         self._async_proc_info = psutil.Process(self._async_proc.pid)
@@ -272,9 +276,10 @@ def find_driver(workload_name) -> Type[BenchDriver]:
 
 
 def bench_driver(workload_name: str, workload_type: str, identifier: str, binding_cores: str, num_threads: int = None,
-                 numa_mem_nodes: str = None, cpu_freq: float = None, cbm_ranges: Union[str, List[str]] = None) \
+                 numa_mem_nodes: str = None, cpu_freq: float = None, cpu_percent: float = None,
+                 cbm_ranges: Union[str, List[str]] = None) \
         -> BenchDriver:
     _bench_driver = find_driver(workload_name)
 
     return _bench_driver(workload_name, workload_type, identifier, binding_cores, num_threads, numa_mem_nodes,
-                         cpu_freq, cbm_ranges)
+                         cpu_freq, cpu_percent, cbm_ranges)
