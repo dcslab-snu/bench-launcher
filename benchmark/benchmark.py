@@ -130,8 +130,9 @@ class Benchmark:
 
             # setup for metric logger
 
-            rabbit_mq_handler = RabbitMQHandler(self._rabbit_mq_config, self._identifier, self._bench_driver.wl_type,
-                                                self._bench_driver.pid, self._perf.pid, self._perf_config.interval)
+            rabbit_mq_handler = RabbitMQHandler(self._rabbit_mq_config, self._bench_driver.name,
+                                                self._bench_driver.wl_type, self._bench_driver.pid,
+                                                self._perf.pid, self._perf_config.interval)
             rabbit_mq_handler.setFormatter(RabbitMQFormatter(self._perf_config.event_names))
 
             metric_logger = logging.getLogger(f'{self._identifier}-rabbitmq')
