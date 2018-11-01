@@ -11,7 +11,7 @@ from typing import Any, Callable, Coroutine, Iterable, List, Optional, Set, Tupl
 import psutil
 
 from ..utils.cgroup import Cgroup
-from ..utils.dvfs import DVFS
+#from ..utils.dvfs import DVFS
 from ..utils.hyphen import convert_to_hyphen, convert_to_set
 from ..utils.numa_topology import NumaTopology
 from ..utils.resctrl import ResCtrl
@@ -187,11 +187,12 @@ class BenchDriver(metaclass=ABCMeta):
                 masks[socket_id] = ResCtrl.MAX_MASK
 
         # setting freq to local config
+        """
         if self._cpu_freq is not None:
             core_set = convert_to_set(self._binding_cores)
             cpufreq_khz = int(self._cpu_freq * 1000000)
             DVFS.set_freq(cpufreq_khz, core_set)
-
+        """
         while True:
             self._bench_proc_info = self._find_bench_proc()
             if self._bench_proc_info is not None:
