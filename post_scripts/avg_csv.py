@@ -8,7 +8,7 @@ from pathlib import Path
 from statistics import mean
 from typing import List
 
-from orderedset import OrderedSet
+from ordered_set import OrderedSet
 
 from post_scripts.tools import WorkloadResult, read_config, read_result
 
@@ -39,6 +39,9 @@ def run(workspace: Path, global_cfg_path: Path):
             row_dict = OrderedDict({'category': category})
 
             for workload in results:
-                row_dict[workload.name] = mean(workload.metrics[category]) * coefficient
+                if category == 'llc_size':
+                    row_dict[workload.name] = mean(workload.metrics[category])
+                else:
+                    row_dict[workload.name] = mean(workload.metrics[category]) * coefficient
 
             csv_writer.writerow(row_dict)
