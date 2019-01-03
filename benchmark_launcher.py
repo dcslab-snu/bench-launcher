@@ -27,7 +27,7 @@ from containers.rabbit_mq_config import RabbitMQConfig
 def parse_workload_cfg(wl_configs: List[Dict[str, Any]]) -> Tuple[BenchConfig, ...]:
     return tuple(
             BenchConfig(config['name'],
-                        config['type'],
+                        config.get('type', 'bg'),
                         config['binding_cores'],
                         config.get('num_of_threads', None),
                         config.get('numa_nodes', None),
