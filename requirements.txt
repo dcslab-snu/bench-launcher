@@ -1,6 +1,6 @@
-aiofiles>=0.3.2
-coloredlogs>=10.0
-ordered-set>=2.0.1
-pika>=0.12.0
-psutil>=5.4.7
-rdtsc>=0.2.1
+aiofiles==0.4.0
+coloredlogs==10.0
+ordered-set==3.1
+pika==0.12.0
+psutil==5.4.8
+rdtsc==0.2.1
