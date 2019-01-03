@@ -147,8 +147,15 @@ class Benchmark:
 
             num_of_events = len(self._perf_config.events)
             if self._perf_config.interval < 100:
-                # remove warning message of perf from buffer
-                await self._perf.stderr.readline()
+                proc = await asyncio.create_subprocess_exec('perf', '--version',
+                                                            stdout=asyncio.subprocess.PIPE,
+                                                            stderr=asyncio.subprocess.DEVNULL)
+                version_line, _ = await proc.communicate()
+                _, _, version_str = version_line.decode().split()  # type: str, str, str
+                major, minor, patch = map(int, version_str.split('.'))  # type: int, int, int
+                if (major, minor, patch) < (4, 17, 0):
+                    # remove warning message of perf from buffer
+                    await self._perf.stderr.readline()
 
             prev_tsc = rdtsc.get_cycles()
             _, prev_local_mem, prev_total_mem = await self._bench_driver.read_resctrl()
