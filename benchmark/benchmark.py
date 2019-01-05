@@ -151,9 +151,9 @@ class Benchmark:
                                                             stdout=asyncio.subprocess.PIPE,
                                                             stderr=asyncio.subprocess.DEVNULL)
                 version_line, _ = await proc.communicate()
-                _, _, version_str = version_line.decode().split()  # type: str, str, str
-                major, minor, patch = map(int, version_str.split('.'))  # type: int, int, int
-                if (major, minor, patch) < (4, 17, 0):
+                version_str = version_line.decode().split()[2]  # type: str
+                major, minor = map(int, version_str.split('.')[:2])  # type: int, int
+                if (major, minor) < (4, 17):
                     # remove warning message of perf from buffer
                     await self._perf.stderr.readline()
 
