@@ -1,12 +1,14 @@
 # coding: UTF-8
 
-import aiofiles
 import asyncio
 import getpass
 import grp
 import os
 import shlex
-from typing import Iterable, Set, Optional
+from typing import Iterable, Optional, Set
+
+import aiofiles
+
 from .hyphen import convert_to_set
 
 
@@ -41,8 +43,8 @@ class Cgroup:
         await proc.communicate()
 
         proc = await asyncio.create_subprocess_exec(
-            'sudo', 'mv', f'{Cgroup.CPU_MOUNT_POINT}/{self._group_name}',
-            f'{Cgroup.CPU_MOUNT_POINT}/{new_group_name}'
+                'sudo', 'mv', f'{Cgroup.CPU_MOUNT_POINT}/{self._group_name}',
+                f'{Cgroup.CPU_MOUNT_POINT}/{new_group_name}'
         )
         await proc.communicate()
 
@@ -63,14 +65,14 @@ class Cgroup:
             core_set: Set[int] = convert_to_set(line)
         return core_set
 
-    async def limit_cpu_quota(self, limit_percentage: float, period: Optional[int]=None) -> None:
+    async def limit_cpu_quota(self, limit_percentage: float, period: Optional[int] = None) -> None:
         if period is None:
             async with aiofiles.open(f'{Cgroup.CPU_MOUNT_POINT}/cpu.cfs_period_us') as afp:
                 line: str = await afp.readline()
                 period = int(line)
 
         cpu_cores = await self._get_cpu_affinity_from_group()
-        quota = int(period * limit_percentage/100 * len(cpu_cores))
+        quota = int(period * limit_percentage / 100 * len(cpu_cores))
         quota_proc = await asyncio.create_subprocess_exec('cgset', '-r', f'cpu.cfs_quota_us={quota}',
                                                           self._group_name)
         await quota_proc.communicate()

@@ -110,7 +110,7 @@ class BenchConfig:
         if not freq_same:
             names.append(f'{target.cpu_freq}GHz')
         if not percent_same:
-                names.append(f'{target.cycle_limit}GHz')
+            names.append(f'{target.cycle_limit}%')
         if not cbm_same:
             names.append(f'cbm{target.cbm_ranges}')
         if num_of_same_cfg is not 0:
