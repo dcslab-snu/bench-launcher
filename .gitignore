@@ -264,3 +264,6 @@ Temporary Items
 .idea
 config.json
 experiments
+density*
+momentum
+result.txt

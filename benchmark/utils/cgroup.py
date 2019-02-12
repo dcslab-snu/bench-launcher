@@ -15,6 +15,7 @@ from .hyphen import convert_to_set
 class Cgroup:
     CPUSET_MOUNT_POINT = '/sys/fs/cgroup/cpuset'
     CPU_MOUNT_POINT = '/sys/fs/cgroup/cpu'
+    MEMORY_MOUNT_POINT = '/sys/fs/cgroup/memory'
 
     def __init__(self, group_name: str, controllers: str) -> None:
         self._group_name: str = group_name
@@ -80,6 +81,12 @@ class Cgroup:
                                                            self._group_name)
         await period_proc.communicate()
 
+    async def limit_memory_percent(self, limit_percentage: float) -> None:
+        limit_bytes = limit_percentage * 32 * 1024 * 1024 * 1024
+        proc = await asyncio.create_subprocess_exec('cgset', '-r', f'memory.limit_in_bytes={limit_bytes}'
+                                                    , self._group_name)
+        await proc.communicate()
+
     async def add_tasks(self, pids: Iterable[int]) -> None:
         proc = await asyncio.create_subprocess_exec('cgclassify', '-g', self._group_path, '--sticky', *map(str, pids))
         await proc.communicate()
@@ -87,3 +94,4 @@ class Cgroup:
     async def delete(self) -> None:
         proc = await asyncio.create_subprocess_exec('sudo', 'cgdelete', '-r', '-g', self._group_path)
         await proc.communicate()
+

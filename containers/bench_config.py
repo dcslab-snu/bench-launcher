@@ -8,7 +8,7 @@ from benchmark.driver.base_driver import BenchDriver, bench_driver
 class BenchConfig:
     def __init__(self, workload_name: str, workload_type: str, binding_cores: str, num_of_threads: int = None,
                  numa_mem_nodes: str = None, cpu_freq: float = None, cycle_limit: float = None,
-                 cycle_limit_period: int = None, cbm_ranges: Union[str, List[str]] = None):
+                 cycle_limit_period: int = None, cbm_ranges: Union[str, List[str]] = None, memory_limit: float = None):
         self._workload_name: str = workload_name
         self._workload_type: str = workload_type
         self._binding_cores: str = binding_cores
@@ -18,6 +18,7 @@ class BenchConfig:
         self._cycle_limit: Optional[float] = cycle_limit
         self._cycle_limit_period: Optional[int] = cycle_limit_period
         self._cbm_ranges: Optional[Union[str, List[str]]] = cbm_ranges
+        self._memory_limit: Optional[float] = memory_limit
 
     @property
     def name(self) -> str:
@@ -55,6 +56,10 @@ class BenchConfig:
     def cbm_ranges(self) -> Optional[Union[str, List[str]]]:
         return self._cbm_ranges
 
+    @property
+    def memory_limit(self) -> Optional[float]:
+        return self._memory_limit
+
     def generate_driver(self, identifier: str) -> BenchDriver:
         return bench_driver(self._workload_name, self._workload_type, identifier, self._binding_cores,
                             self._num_of_threads, self._numa_mem_nodes, self._cpu_freq, self._cycle_limit,
@@ -69,6 +74,7 @@ class BenchConfig:
         freq_same = True
         percent_same = True
         cbm_same = True
+        memory_same = True
 
         index_in_same_cfg = None
         num_of_same_cfg = 0
@@ -90,6 +96,8 @@ class BenchConfig:
                 _all_same = percent_same = False
             if target.cbm_ranges != config._cbm_ranges:
                 _all_same = cbm_same = False
+            if target.memory_limit != config._memory_limit:
+                _all_same = memory_same = False
 
             if _all_same:
                 if target is config:
@@ -113,6 +121,8 @@ class BenchConfig:
             names.append(f'{target.cycle_limit}%')
         if not cbm_same:
             names.append(f'cbm{target.cbm_ranges}')
+        if not memory_same:
+            names.append(f'cbm{target.memory_limit}')
         if num_of_same_cfg is not 0:
             names.append(str(index_in_same_cfg))
 

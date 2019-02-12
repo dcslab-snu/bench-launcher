@@ -34,7 +34,8 @@ def parse_workload_cfg(wl_configs: List[Dict[str, Any]]) -> Tuple[BenchConfig, .
                         config.get('cpu_freq', None),
                         config.get('cycle_limit', None),
                         config.get('cycle_limit_period', None),
-                        config.get('cbm_ranges', None))
+                        config.get('cbm_ranges', None),
+                        config.get('memory_limit', None))
             for config in wl_configs
     )
 

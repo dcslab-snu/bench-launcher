@@ -58,7 +58,7 @@ class BenchDriver(metaclass=ABCMeta):
 
     def __init__(self, name: str, workload_type: str, identifier: str, binding_cores: str, num_threads: int = None,
                  numa_mem_nodes: str = None, cpu_freq: float = None, cycle_limit: float = None,
-                 cycle_limit_period: int = None, cbm_ranges: Union[str, List[str]] = None):
+                 cycle_limit_period: int = None, cbm_ranges: Union[str, List[str]] = None, memory_limit: float):
         self._name: str = name
         self._type: str = workload_type
         self._identifier: str = identifier
@@ -78,7 +78,7 @@ class BenchDriver(metaclass=ABCMeta):
         self._async_proc_info: Optional[psutil.Process] = None
 
         self._group_name = identifier
-        self._cgroup: Cgroup = Cgroup(identifier, 'cpuset,cpu')
+        self._cgroup: Cgroup = Cgroup(identifier, 'cpuset,cpu,memory')
         self._resctrl_group: ResCtrl = ResCtrl()
 
     def __del__(self):
