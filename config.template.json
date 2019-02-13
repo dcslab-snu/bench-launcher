@@ -33,9 +33,10 @@
 		}
 	},
 	"benchmark": {
-		"parsec": "/home/bhyoo/benchmarks/parsec-3.0/bin",
-		"spec": "/home/bhyoo/benchmarks/cpu2006",
-		"rodinia": "/home/bhyoo/benchmarks/rodinia_3.1",
-		"npb": "/home/bhyoo/benchmarks/NPB3.3.1/NPB3.3-OMP"
+		"parsec": "/home/dcslab/ysnam/benchmarks/parsec-3.0/bin",
+		"spec": "/home/dcslab/ysnam/benchmarks/cpu2006",
+		"rodinia": "/home/dcslab/ysnam/benchmarks/rodinia_3.1",
+		"npb": "/home/dcslab/ysnam/benchmarks/NPB3.3.1/NPB3.3-OMP",
+		"cifar10": "/home/dcslab/ysnam/benchmarks/tensorflow/models/tutorials/image/cifar10"
 	}
 }

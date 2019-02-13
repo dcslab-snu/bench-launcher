@@ -58,7 +58,7 @@ class BenchDriver(metaclass=ABCMeta):
 
     def __init__(self, name: str, workload_type: str, identifier: str, binding_cores: str, num_threads: int = None,
                  numa_mem_nodes: str = None, cpu_freq: float = None, cycle_limit: float = None,
-                 cycle_limit_period: int = None, cbm_ranges: Union[str, List[str]] = None, memory_limit: float):
+                 cycle_limit_period: int = None, cbm_ranges: Union[str, List[str]] = None, memory_limit: float = None):
         self._name: str = name
         self._type: str = workload_type
         self._identifier: str = identifier
@@ -72,6 +72,7 @@ class BenchDriver(metaclass=ABCMeta):
         self._cycle_limit: Optional[float] = cycle_limit
         self._cycle_limit_period: Optional[int] = cycle_limit_period
         self._cbm_ranges: Optional[Union[str, List[str]]] = cbm_ranges
+        self._memory_limit: Optional[float] = memory_limit
 
         self._bench_proc_info: Optional[psutil.Process] = None
         self._async_proc: Optional[asyncio.subprocess.Process] = None
@@ -162,6 +163,8 @@ class BenchDriver(metaclass=ABCMeta):
         await self._cgroup.assign_mems(mem_sockets)
         if self._cycle_limit is not None:
             await self._cgroup.limit_cpu_quota(self._cycle_limit, self._cycle_limit_period)
+        if self._memory_limit is not None:
+            await self._cgroup.limit_memory_percent(self._memory_limit)
 
         self._async_proc = await self._launch_bench()
         self._async_proc_info = psutil.Process(self._async_proc.pid)

@@ -18,19 +18,21 @@ class Cifar10Driver(BenchDriver):
         return bench_name in Cifar10Driver._benches
 
     def _find_bench_proc(self) -> Optional[psutil.Process]:
-        if self._name == 'raytrace':
-            exec_name = 'rtview'
+        children = self._async_proc_info.children(True)
+
+        if len(children) is 0:
+            return None
         else:
-            exec_name = self._name
-
-        for process in self._async_proc_info.children(recursive=True):  # type: psutil.Process
-            if process.name() == exec_name and process.is_running():
-                return process
-
-        return None
+            return children[0]
 
     async def _launch_bench(self) -> asyncio.subprocess.Process:
-        cmd = '{0}/parsecmgmt -a run -p {1} -i native -n {2}' \
-            .format(self._bench_home, self._name, self._num_threads)
+        if 'train' in self._name:
+            args = '--max_steps 1000'
+            cmd = f'python {0}/{1}.py {2}' \
+                .format(self._bench_home, self._name, args)
+        elif 'eval' in self._name:
+            args = '--run_multiple 10 --eval_interval_secs 1'
+            cmd = f'python {0}/{1}.py {2}' \
+                .format(self._bench_home, self._name, args)
 
         return await self._cgroup.exec_command(cmd, stdout=asyncio.subprocess.DEVNULL)
