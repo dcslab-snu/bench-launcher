@@ -269,8 +269,9 @@ def find_driver(workload_name) -> Type[BenchDriver]:
     from benchmark.driver.parsec_driver import ParsecDriver
     from benchmark.driver.rodinia_driver import RodiniaDriver
     from benchmark.driver.npb_driver import NPBDriver
+    from benchmark.driver.cifar10_driver import Cifar10Driver
 
-    bench_drivers = (SpecDriver, ParsecDriver, RodiniaDriver, NPBDriver)
+    bench_drivers = (SpecDriver, ParsecDriver, RodiniaDriver, NPBDriver, Cifar10Driver)
 
     for driver in bench_drivers:
         if driver.has(workload_name):
@@ -281,9 +282,9 @@ def find_driver(workload_name) -> Type[BenchDriver]:
 
 def bench_driver(workload_name: str, workload_type: str, identifier: str, binding_cores: str, num_threads: int = None,
                  numa_mem_nodes: str = None, cpu_freq: float = None, cycle_limit: float = None,
-                 cbm_ranges: Union[str, List[str]] = None) \
+                 cbm_ranges: Union[str, List[str]] = None, memory_limit: float = None) \
         -> BenchDriver:
     _bench_driver = find_driver(workload_name)
 
     return _bench_driver(workload_name, workload_type, identifier, binding_cores, num_threads, numa_mem_nodes,
-                         cpu_freq, cycle_limit, cbm_ranges)
+                         cpu_freq, cycle_limit, cbm_ranges, memory_limit)

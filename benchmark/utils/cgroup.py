@@ -49,6 +49,12 @@ class Cgroup:
         )
         await proc.communicate()
 
+        proc = await asyncio.create_subprocess_exec(
+            'sudo', 'mv', f'{Cgroup.MEMORY_MOUNT_POINT}/{self._group_name}',
+            f'{Cgroup.MEMORY_MOUNT_POINT}/{new_group_name}'
+        )
+        await proc.communicate()
+
         self._group_name = new_group_name
         self._group_path = f'{self._controllers}:{self._group_name}'
 
