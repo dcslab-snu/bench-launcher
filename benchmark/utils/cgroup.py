@@ -88,7 +88,7 @@ class Cgroup:
         await period_proc.communicate()
 
     async def limit_memory_percent(self, limit_percentage: float) -> None:
-        limit_bytes = limit_percentage * 32 * 1024 * 1024 * 1024
+        limit_bytes = int(limit_percentage * 32 * 1024 * 1024 * 1024)
         proc = await asyncio.create_subprocess_exec('cgset', '-r', f'memory.limit_in_bytes={limit_bytes}'
                                                     , self._group_name)
         await proc.communicate()

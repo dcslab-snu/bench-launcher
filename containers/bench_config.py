@@ -63,7 +63,7 @@ class BenchConfig:
     def generate_driver(self, identifier: str) -> BenchDriver:
         return bench_driver(self._workload_name, self._workload_type, identifier, self._binding_cores,
                             self._num_of_threads, self._numa_mem_nodes, self._cpu_freq, self._cycle_limit,
-                            self._cbm_ranges)
+                            self._cbm_ranges, self._memory_limit)
 
     @staticmethod
     def gen_identifier(target: 'BenchConfig', configs: List['BenchConfig']) -> str:

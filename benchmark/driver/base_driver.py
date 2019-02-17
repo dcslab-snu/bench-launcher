@@ -164,6 +164,7 @@ class BenchDriver(metaclass=ABCMeta):
         if self._cycle_limit is not None:
             await self._cgroup.limit_cpu_quota(self._cycle_limit, self._cycle_limit_period)
         if self._memory_limit is not None:
+            print(f'self._memory_limit: {self._memory_limit}')
             await self._cgroup.limit_memory_percent(self._memory_limit)
 
         self._async_proc = await self._launch_bench()
@@ -175,6 +176,7 @@ class BenchDriver(metaclass=ABCMeta):
         masks = [ResCtrl.MIN_MASK] * (max(nodes) + 1)
 
         # change the cbm_ranges to cbm_ranges_list
+        print(f'self._cbm_ranges: {self._cbm_ranges}')
         if self._cbm_ranges is not None:
             if isinstance(self._cbm_ranges, str):
                 start, end = map(int, self._cbm_ranges.split('-'))
