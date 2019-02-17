@@ -284,9 +284,9 @@ def find_driver(workload_name) -> Type[BenchDriver]:
 
 def bench_driver(workload_name: str, workload_type: str, identifier: str, binding_cores: str, num_threads: int = None,
                  numa_mem_nodes: str = None, cpu_freq: float = None, cycle_limit: float = None,
-                 cbm_ranges: Union[str, List[str]] = None, memory_limit: float = None) \
+                 cycle_limit_period: int = None, cbm_ranges: Union[str, List[str]] = None, memory_limit: float = None) \
         -> BenchDriver:
     _bench_driver = find_driver(workload_name)
 
     return _bench_driver(workload_name, workload_type, identifier, binding_cores, num_threads, numa_mem_nodes,
-                         cpu_freq, cycle_limit, cbm_ranges, memory_limit)
+                         cpu_freq, cycle_limit, cycle_limit_period, cbm_ranges, memory_limit)
