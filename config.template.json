@@ -37,6 +37,7 @@
 		"spec": "/home/dcslab/ysnam/benchmarks/cpu2006",
 		"rodinia": "/home/dcslab/ysnam/benchmarks/rodinia_3.1",
 		"npb": "/home/dcslab/ysnam/benchmarks/NPB3.3.1/NPB3.3-OMP",
-		"cifar10": "/home/dcslab/ysnam/benchmarks/tensorflow/models/tutorials/image/cifar10"
+		"cifar10": "/home/dcslab/ysnam/benchmarks/tensorflow/models/tutorials/image/cifar10",
+		"inception": "/home/dcslab/ysnam/benchmarks/tensorflow/models/research/inception/bazel-bin/inception"
 	}
 }

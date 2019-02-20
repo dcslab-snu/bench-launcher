@@ -272,8 +272,9 @@ def find_driver(workload_name) -> Type[BenchDriver]:
     from benchmark.driver.rodinia_driver import RodiniaDriver
     from benchmark.driver.npb_driver import NPBDriver
     from benchmark.driver.cifar10_driver import Cifar10Driver
+    from benchmark.driver.inception_driver import InceptionDriver
 
-    bench_drivers = (SpecDriver, ParsecDriver, RodiniaDriver, NPBDriver, Cifar10Driver)
+    bench_drivers = (SpecDriver, ParsecDriver, RodiniaDriver, NPBDriver, Cifar10Driver, InceptionDriver)
 
     for driver in bench_drivers:
         if driver.has(workload_name):
