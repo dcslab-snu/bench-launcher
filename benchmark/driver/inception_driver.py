@@ -38,7 +38,7 @@ class InceptionDriver(BenchDriver):
             cmd = '{0}/{1} {2}' \
                 .format(self._bench_home, self._name, args)
         elif 'eval' in self._name:
-            args = '--num_examples 800 --run_once --data_dir /ssd2/converted_data'
+            args = '--num_examples 800 --run_once --data_dir /ssd2/converted_data --checkpoint_dir /tmp/imagenet_train_for_eval'
             cmd = '{0}/{1} {2}' \
                 .format(self._bench_home, self._name, args)
 
